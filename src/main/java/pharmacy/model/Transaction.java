@@ -1,6 +1,6 @@
-package model;
+package pharmacy.model;
 
-import enums.TransactionType;
+import pharmacy.enums.TransactionType;
 
 public class Transaction {
     private final int id;

@@ -11,8 +11,8 @@ A rebuild of the pharmacy's stock and dispensing tracker. It does exactly what t
 You need JDK 21. From the project folder, in any terminal:
 
 ```bash
-javac -d target/classes -sourcepath src/main/java src/main/java/PharmacyTracker.java
-java -cp target/classes PharmacyTracker
+javac -d target/classes -sourcepath src/main/java src/main/java/pharmacy/PharmacyTracker.java
+java -cp target/classes pharmacy.PharmacyTracker
 ```
 
 Or with Maven: `mvn compile`, then the same `java` line.
@@ -40,12 +40,12 @@ To run them, use `mvn test`, or open the project in IntelliJ and run the tests u
 ## Project layout
 
 ```
-src/main/java/
+src/main/java/pharmacy/
   PharmacyTracker.java          the same morning of sales as the original
   model/                        Pharmacy, Medication and its subclasses, Customer, Transaction
   enums/                        Category, CustomerKind, TransactionType
   exception/                    DispenseException and the reasons a sale can be refused
-src/test/java/model/
+src/test/java/pharmacy/model/
   PharmacyTest.java             dispensing, refusals, discount, prescriber, read-only transactions
   MedicationTest.java           stock and value checks on a single medicine
 ```

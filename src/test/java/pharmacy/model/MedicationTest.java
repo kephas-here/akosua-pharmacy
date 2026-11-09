@@ -1,6 +1,6 @@
-package model;
+package pharmacy.model;
 
-import exception.InsufficientStockException;
+import pharmacy.exception.InsufficientStockException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

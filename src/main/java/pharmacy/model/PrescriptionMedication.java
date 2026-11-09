@@ -1,7 +1,7 @@
-package model;
+package pharmacy.model;
 
-import enums.Category;
-import exception.MissingPrescriberException;
+import pharmacy.enums.Category;
+import pharmacy.exception.MissingPrescriberException;
 
 public class PrescriptionMedication extends Medication {
     public PrescriptionMedication(String name, double price, int stock) {

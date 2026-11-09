@@ -4,10 +4,11 @@
 
 I cloned the starter repository, compiled it and ran it before changing any code. The untouched output is saved in [`expected-output-before.txt`](expected-output-before.txt) and is my baseline for proving behaviour is preserved. The original file was committed on its own, then this document, before my first code change.
 
-To reproduce the baseline (from Git Bash, so the file is saved as plain UTF-8):
+To reproduce the baseline, run the original single file from the starter commit (from Git Bash, so the file is saved as plain UTF-8):
 
 ```bash
-java src/main/java/PharmacyTracker.java > expected-output-before.txt
+git show 37f7f65:src/main/java/PharmacyTracker.java > OriginalTracker.java
+java OriginalTracker.java > expected-output-before.txt
 ```
 
 ## 2. What I observed
@@ -96,8 +97,8 @@ The rebuilt output is in [`actual-output-after.txt`](actual-output-after.txt). C
 To reproduce it (from Git Bash):
 
 ```bash
-javac -d target/classes $(find src/main/java -name '*.java')
-java -cp target/classes PharmacyTracker > actual-output-after.txt
+javac -d target/classes -sourcepath src/main/java src/main/java/pharmacy/PharmacyTracker.java
+java -cp target/classes pharmacy.PharmacyTracker > actual-output-after.txt
 diff expected-output-before.txt actual-output-after.txt
 ```
 
@@ -119,3 +120,4 @@ diff expected-output-before.txt actual-output-after.txt
 - **`meds` renamed to `medications`** in `Pharmacy` for readability.
 - **Each sale now records its prescriber.** The original printed the prescriber and then lost it, but a prescription has to be recorded, and controlled substances will need it on every dispense. `Transaction` stores it (empty for OTC sales and restocks), so adding controlled medicine won't need to touch `Transaction`. The output doesn't change.
 - **Added JUnit tests as my improvement beyond the brief.** The original could only be checked by running it and reading the output. The tests cover the rules the business depends on, so the next change can be checked straight away. The README has the full list.
+- **All packages live under one `pharmacy` root** (`pharmacy.model`, `pharmacy.enums`, `pharmacy.exception`). Top-level names like `exception` are too generic and could clash with other code.

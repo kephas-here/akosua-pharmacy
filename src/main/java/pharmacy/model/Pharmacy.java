@@ -1,9 +1,9 @@
-package model;
+package pharmacy.model;
 
-import enums.Category;
-import enums.CustomerKind;
-import enums.TransactionType;
-import exception.DispenseException;
+import pharmacy.enums.Category;
+import pharmacy.enums.CustomerKind;
+import pharmacy.enums.TransactionType;
+import pharmacy.exception.DispenseException;
 
 import java.util.ArrayList;
 import java.util.List;

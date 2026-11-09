@@ -1,9 +1,11 @@
-import enums.CustomerKind;
-import model.Customer;
-import model.Medication;
-import model.OtcMedication;
-import model.Pharmacy;
-import model.PrescriptionMedication;
+package pharmacy;
+
+import pharmacy.enums.CustomerKind;
+import pharmacy.model.Customer;
+import pharmacy.model.Medication;
+import pharmacy.model.OtcMedication;
+import pharmacy.model.Pharmacy;
+import pharmacy.model.PrescriptionMedication;
 
 public class PharmacyTracker {
 

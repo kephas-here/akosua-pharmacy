@@ -1,6 +1,6 @@
-package model;
+package pharmacy.model;
 
-import enums.CustomerKind;
+import pharmacy.enums.CustomerKind;
 
 import java.util.ArrayList;
 import java.util.List;

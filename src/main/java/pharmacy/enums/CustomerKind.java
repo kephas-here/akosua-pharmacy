@@ -1,4 +1,4 @@
-package enums;
+package pharmacy.enums;
 
 public enum CustomerKind {
     WALK_IN,

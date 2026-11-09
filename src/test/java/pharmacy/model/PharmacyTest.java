@@ -1,6 +1,6 @@
-package model;
+package pharmacy.model;
 
-import enums.CustomerKind;
+import pharmacy.enums.CustomerKind;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

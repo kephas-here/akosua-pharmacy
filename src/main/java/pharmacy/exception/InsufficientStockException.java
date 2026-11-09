@@ -1,4 +1,4 @@
-package exception;
+package pharmacy.exception;
 
 public class InsufficientStockException extends DispenseException {
     public InsufficientStockException(String medName, int requested, int available) {

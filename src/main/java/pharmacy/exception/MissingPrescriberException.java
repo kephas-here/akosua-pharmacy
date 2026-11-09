@@ -1,4 +1,4 @@
-package exception;
+package pharmacy.exception;
 
 public class MissingPrescriberException extends DispenseException {
     public MissingPrescriberException(String medName) {

@@ -1,6 +1,6 @@
-package model;
+package pharmacy.model;
 
-import enums.Category;
+import pharmacy.enums.Category;
 
 public class OtcMedication extends Medication {
     public OtcMedication(String name, double price, int stock) {

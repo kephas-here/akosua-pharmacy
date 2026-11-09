@@ -1,7 +1,7 @@
-package model;
+package pharmacy.model;
 
-import enums.Category;
-import exception.InsufficientStockException;
+import pharmacy.enums.Category;
+import pharmacy.exception.InsufficientStockException;
 
 public abstract class Medication {
     private String name;
