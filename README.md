@@ -19,6 +19,24 @@ Or with Maven: `mvn compile`, then the same `java` line.
 
 To compare with the original, check the output against [expected-output-before.txt](expected-output-before.txt). Only three lines differ, all from the one sale that asks for more Amoxicillin than is in stock. It is now refused, stock stays at 39 instead of -61, and three transactions are recorded instead of four. Section 5 of the diagnosis has the details.
 
+## Tests (improvement beyond the brief)
+
+The original had no tests, so the only way to know a change hadn't broken something was to run the program and read the output by eye. That's how a change to one kind of medicine quietly broke another, and why Akosua stopped trusting the tool.
+
+I added JUnit tests for the rules the business depends on:
+
+- Stock can't go below zero, and a sale that asks for too much is refused with nothing recorded.
+- A prescription medicine needs a prescriber, and a blank one doesn't count.
+- An OTC sale needs no prescriber.
+- Registered patients get 5% off.
+- A prescription sale records its prescriber and the customer's history.
+- Quantities, prices and names are checked, so bad values are rejected.
+- The transaction list can't be changed from outside.
+
+Anyone who changes the code next, like adding controlled substances, can run these and know straight away whether the existing rules still hold.
+
+To run them, use `mvn test`, or open the project in IntelliJ and run the tests under `src/test/java`.
+
 ## Project layout
 
 ```
@@ -27,6 +45,9 @@ src/main/java/
   model/                        Pharmacy, Medication and its subclasses, Customer, Transaction
   enums/                        Category, CustomerKind, TransactionType
   exception/                    DispenseException and the reasons a sale can be refused
+src/test/java/model/
+  PharmacyTest.java             dispensing, refusals, discount, prescriber, read-only transactions
+  MedicationTest.java           stock and value checks on a single medicine
 ```
 
 ## Design notes

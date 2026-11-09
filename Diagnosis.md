@@ -118,3 +118,4 @@ diff expected-output-before.txt actual-output-after.txt
 - **The registered discount is a constant.** `REGISTERED_DISCOUNT = 0.95` in `Pharmacy` replaces the `0.95` that was repeated in both branches.
 - **`meds` renamed to `medications`** in `Pharmacy` for readability.
 - **Each sale now records its prescriber.** The original printed the prescriber and then lost it, but a prescription has to be recorded, and controlled substances will need it on every dispense. `Transaction` stores it (empty for OTC sales and restocks), so adding controlled medicine won't need to touch `Transaction`. The output doesn't change.
+- **Added JUnit tests as my improvement beyond the brief.** The original could only be checked by running it and reading the output. The tests cover the rules the business depends on, so the next change can be checked straight away. The README has the full list.
