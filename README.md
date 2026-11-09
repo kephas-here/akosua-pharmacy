@@ -49,6 +49,11 @@ To run them, use `mvn test`, or open the project in IntelliJ and run the tests u
 ## Project layout
 
 ```
+pom.xml                         Maven build: Java 21, JUnit 5 for `mvn test`
+DIAGNOSIS.md                    diagnosis, written before the first code change
+design-sketch.jpg               class diagram of the planned structure
+expected-output-before.txt      output of the original program
+actual-output-after.txt         output of the rebuild
 src/main/java/pharmacy/
   PharmacyTracker.java          the same morning of sales as the original
   model/                        Pharmacy, Medication and its subclasses, Customer, Transaction
