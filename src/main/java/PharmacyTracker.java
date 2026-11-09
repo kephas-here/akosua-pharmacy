@@ -1,3 +1,4 @@
+import enums.CustomerKind;
 import model.Customer;
 import model.Medication;
 import model.Pharmacy;
@@ -12,9 +13,9 @@ public class PharmacyTracker {
         p.addMedication(paracetamol);
         p.addMedication(amoxicillin);
 
-        Customer kofi = new Customer("Kofi Mensah", "WALK_IN");
-        Customer ama = new Customer("Ama Owusu", "REGISTERED");
-        ama.phone = "0244 000 000"; // registered patients have contact details on file
+        Customer kofi = new Customer("Kofi Mensah", CustomerKind.WALK_IN);
+        Customer ama = new Customer("Ama Owusu", CustomerKind.REGISTERED);
+        ama.setPhone("0244 000 000"); // registered patients have contact details on file
         p.addCustomer(kofi);
         p.addCustomer(ama);
 

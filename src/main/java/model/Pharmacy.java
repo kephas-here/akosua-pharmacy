@@ -1,5 +1,6 @@
 package model;
 
+import enums.CustomerKind;
 import enums.TransactionType;
 
 import java.util.ArrayList;
@@ -28,11 +29,11 @@ public class Pharmacy {
         double total = 0;
         if (m.category.equals("OTC")) {
             total = m.price * qty;
-            if (c.kind.equals("REGISTERED")) {
+            if (c.getKind() == CustomerKind.REGISTERED) {
                 total = total * 0.95; // registered patients get 5% off
             }
             m.stock = m.stock - qty;
-            System.out.println("Dispensed " + qty + " x " + m.name + " to " + c.name
+            System.out.println("Dispensed " + qty + " x " + m.name + " to " + c.getName()
                     + " for GHS " + total);
         } else if (m.category.equals("PRESCRIPTION")) {
             if (prescriber == null) {
@@ -40,15 +41,15 @@ public class Pharmacy {
                 return;
             }
             total = m.price * qty;
-            if (c.kind.equals("REGISTERED")) {
+            if (c.getKind() == CustomerKind.REGISTERED) {
                 total = total * 0.95; // registered patients get 5% off
             }
             m.stock = m.stock - qty;
-            System.out.println("Dispensed " + qty + " x " + m.name + " to " + c.name
+            System.out.println("Dispensed " + qty + " x " + m.name + " to " + c.getName()
                     + " (prescribed by " + prescriber + ") for GHS " + total);
         }
-        c.history.add("Got " + qty + " x " + m.name);
-        transactions.add(new Transaction(c.name, m.name, qty, total, TransactionType.DISPENSE));
+        c.addHistory(m.name, qty);
+        transactions.add(new Transaction(c.getName(), m.name, qty, total, TransactionType.DISPENSE));
     }
 
     public void restock(Medication m, int qty) {
