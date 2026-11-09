@@ -14,6 +14,7 @@ public class Pharmacy {
     private final List<Medication> medications = new ArrayList<>();
     private final List<Customer> customers = new ArrayList<>();
     private final List<Transaction> transactions = new ArrayList<>();
+    private final List<String> refusals = new ArrayList<>();
 
     public Pharmacy(String name) {
         setName(name);
@@ -67,6 +68,7 @@ public class Pharmacy {
             System.out.println("Dispensed " + qty + " x " + medication.getName() + " to " + customer.getName()
                     + medication.prescriberNote(prescriber) + " for GHS " + total);
         } catch (DispenseException e) {
+            refusals.add(e.getMessage());
             System.out.println(e.getMessage());
         }
     }
@@ -79,6 +81,10 @@ public class Pharmacy {
 
     public List<Transaction> getTransactions() {
         return List.copyOf(transactions);
+    }
+
+    public List<String> getRefusals() {
+        return List.copyOf(refusals);
     }
 
     public void printReport() {

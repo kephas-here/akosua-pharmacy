@@ -32,6 +32,7 @@ I added JUnit tests for the rules the business depends on:
 - A prescription sale records its prescriber and the customer's history.
 - Quantities, prices and names are checked, so bad values are rejected.
 - The transaction list can't be changed from outside.
+- A refused sale is kept in the refusals list.
 
 Anyone who changes the code next, like adding controlled substances, can run these and know straight away whether the existing rules still hold.
 
@@ -66,7 +67,7 @@ The category is never stored as a field. Each subclass returns its own `Category
 
 ### A refused sale leaves no trace
 
-When a sale can't go ahead, the medicine throws an unchecked exception: `MissingPrescriberException` or `InsufficientStockException`, both extending `DispenseException`. `Pharmacy` catches the one parent type and prints its message. Everything that records the sale (history, transaction, receipt line) comes after the checks, so a refused sale records nothing.
+When a sale can't go ahead, the medicine throws an unchecked exception: `MissingPrescriberException` or `InsufficientStockException`, both extending `DispenseException`. `Pharmacy` catches the one parent type and prints its message. Everything that records the sale (history, transaction, receipt line) comes after the checks, so a refused sale records nothing. The refusal itself is kept in `getRefusals()`, so the pharmacy can see afterwards what was turned away and why, not just in what was printed.
 
 I chose exceptions over returning `true`/`false`, because a return value is easy to ignore and the sale would go through anyway. I made them unchecked because `Pharmacy` handles them in one place, and checked exceptions would force every caller to deal with them.
 

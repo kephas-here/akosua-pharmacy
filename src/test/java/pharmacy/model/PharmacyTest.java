@@ -39,6 +39,14 @@ class PharmacyTest {
     }
 
     @Test
+    void refusedSaleIsKeptAsARefusal() {
+        pharmacy.dispense(kofi, amoxicillin, 100, "Dr. Boateng");
+
+        assertEquals(1, pharmacy.getRefusals().size());
+        assertEquals("Cannot dispense 100 x Amoxicillin 250mg: only 40 in stock", pharmacy.getRefusals().get(0));
+    }
+
+    @Test
     void dispensingExactlyWhatIsInStockLeavesZero() {
         pharmacy.dispense(kofi, amoxicillin, 40, "Dr. Boateng");
 
