@@ -1,12 +1,16 @@
 package model;
 
+import enums.Category;
 import enums.CustomerKind;
 import enums.TransactionType;
+import exception.DispenseException;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Pharmacy {
+    private static final double REGISTERED_DISCOUNT = 0.95;
+
     public String name;
     public List<Medication> meds = new ArrayList<>();
     public List<Customer> customers = new ArrayList<>();
@@ -24,38 +28,32 @@ public class Pharmacy {
         customers.add(c);
     }
 
-    // Dispense medicine to a customer. The rules depend on the kind of medicine.
-    public void dispense(Customer c, Medication m, int qty, String prescriber) {
-        double total = 0;
-        if (m.category.equals("OTC")) {
-            total = m.price * qty;
-            if (c.getKind() == CustomerKind.REGISTERED) {
-                total = total * 0.95; // registered patients get 5% off
+    public void dispense(Customer customer, Medication medication, int qty, String prescriber) {
+        try {
+            medication.verifyDispensable(prescriber);
+            double total = medication.getPrice() * qty;
+            if (customer.getKind() == CustomerKind.REGISTERED) {
+                total = total * REGISTERED_DISCOUNT;
             }
-            m.stock = m.stock - qty;
-            System.out.println("Dispensed " + qty + " x " + m.name + " to " + c.getName()
-                    + " for GHS " + total);
-        } else if (m.category.equals("PRESCRIPTION")) {
-            if (prescriber == null) {
-                System.out.println("Cannot dispense " + m.name + " without a prescriber");
-                return;
-            }
-            total = m.price * qty;
-            if (c.getKind() == CustomerKind.REGISTERED) {
-                total = total * 0.95; // registered patients get 5% off
-            }
-            m.stock = m.stock - qty;
-            System.out.println("Dispensed " + qty + " x " + m.name + " to " + c.getName()
-                    + " (prescribed by " + prescriber + ") for GHS " + total);
+            medication.deductStock(qty);
+            customer.addHistory(medication.getName(), qty);
+            transactions.add(new Transaction(customer.getName(), medication.getName(), qty, total,
+                    TransactionType.DISPENSE));
+
+            String prescribedBy = medication.getCategory() == Category.PRESCRIPTION
+                    ? " (prescribed by " + prescriber + ")" : "";
+
+            System.out.println("Dispensed " + qty + " x " + medication.getName() + " to " + customer.getName()
+                    + prescribedBy + " for GHS " + total);
+        } catch (DispenseException e) {
+            System.out.println(e.getMessage());
         }
-        c.addHistory(m.name, qty);
-        transactions.add(new Transaction(c.getName(), m.name, qty, total, TransactionType.DISPENSE));
     }
 
-    public void restock(Medication m, int qty) {
-        m.stock = m.stock + qty;
-        transactions.add(new Transaction("(supplier)", m.name, qty, 0, TransactionType.RESTOCK));
-        System.out.println("Restocked " + qty + " x " + m.name);
+    public void restock(Medication medication, int qty) {
+        medication.addStock(qty);
+        transactions.add(new Transaction("(supplier)", medication.getName(), qty, 0, TransactionType.RESTOCK));
+        System.out.println("Restocked " + qty + " x " + medication.getName());
     }
 
     public List<Transaction> getTransactions() {
@@ -67,7 +65,7 @@ public class Pharmacy {
         System.out.println("=== " + name + " - end of day ===");
         System.out.println("Stock levels:");
         for (Medication m : meds) {
-            System.out.println("  " + m.name + " (" + m.category + "): " + m.stock + " in stock");
+            System.out.println("  " + m.getName() + " (" + m.getCategory() + "): " + m.getStock() + " in stock");
         }
         System.out.println("Transactions today: " + transactions.size());
     }

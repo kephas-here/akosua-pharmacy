@@ -1,15 +1,17 @@
 import enums.CustomerKind;
 import model.Customer;
 import model.Medication;
+import model.OtcMedication;
 import model.Pharmacy;
+import model.PrescriptionMedication;
 
 public class PharmacyTracker {
 
     public static void main(String[] args) {
         Pharmacy p = new Pharmacy("Akosua's Pharmacy");
 
-        Medication paracetamol = new Medication("Paracetamol 500mg", 12.50, 100, "OTC");
-        Medication amoxicillin = new Medication("Amoxicillin 250mg", 30.00, 40, "PRESCRIPTION");
+        Medication paracetamol = new OtcMedication("Paracetamol 500mg", 12.50, 100);
+        Medication amoxicillin = new PrescriptionMedication("Amoxicillin 250mg", 30.00, 40);
         p.addMedication(paracetamol);
         p.addMedication(amoxicillin);
 

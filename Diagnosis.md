@@ -90,4 +90,7 @@ The rebuilt output should match the baseline line for line with exactly one inte
 - **`StockNotEnoughException` renamed to `InsufficientStockException`.** "Insufficient stock" is the standard phrase in Java and in retail, and it reads more clearly at the throw site. The class does the same job in the same place in the hierarchy, so the sketch above still shows it under its original name.
 - **Exceptions build their own messages.** Instead of a free-text message, each exception takes the facts it needs (`InsufficientStockException(medName, requested, available)`, `MissingPrescriberException(medName)`) and writes the message itself. Every refusal of the same kind is worded the same way, and the missing-prescriber message keeps the original program's exact wording.
 - **`DispenseException` is abstract.** It exists only as the one type `Pharmacy` catches, so it cannot be thrown on its own.
+- **Added a private `requirePositive(qty)` helper in `Medication`.** It isn't in the sketch. `addStock` and `deductStock` both use it, so the quantity check lives in one place.
+- **A blank prescriber is refused too, not just `null`.** This closes the gap noted in Problem 2. The output doesn't change since `main` never passes a blank one.
 - **`Customer.addHistory(medName, qty)` added.** It's package-private so only `Pharmacy` can write history, and `getHistory()` stays read-only.
+- **The registered discount is a constant.** `REGISTERED_DISCOUNT = 0.95` in `Pharmacy` replaces the `0.95` that was repeated in both branches.
