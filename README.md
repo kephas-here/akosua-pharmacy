@@ -1,41 +1,75 @@
 # Akosua's Pharmacy — Stock and Dispensing Tracker
 
-This is the starter repository for the **Java Basics** applied lab. Read the lab
-brief (*Java Basics Lab A — Akosua's Pharmacy*) alongside this repository; it
-explains the business, what you are being asked to deliver, and how your work is
-assessed.
+A rebuild of the pharmacy's stock and dispensing tracker. It does exactly what the original did, except that stock can no longer go below zero.
 
-## What this is
-
-A small in-house program that Akosua's pharmacy uses to track what is in stock
-and what gets dispensed. It works, but it has become risky to change. Your task
-is to diagnose it and rebuild it well — **not** to change what it does, but to
-make it safe to change and impossible to leave in an invalid state.
+- Diagnosis and design sketch: [Diagnosis.md](Diagnosis.md)
+- Output of the original program: [expected-output-before.txt](expected-output-before.txt)
+- Output of the rebuild: [actual-output-after.txt](actual-output-after.txt)
 
 ## Running it
 
-The program is plain Java (no external dependencies). You need JDK 21.
-
-**With Maven:**
+You need JDK 21. From the project folder, in any terminal:
 
 ```bash
-mvn compile
-mvn exec:java -Dexec.mainClass=PharmacyTracker
-```
-
-**Or directly with the JDK:**
-
-```bash
-javac -d target/classes src/main/java/PharmacyTracker.java
+javac -d target/classes -sourcepath src/main/java src/main/java/PharmacyTracker.java
 java -cp target/classes PharmacyTracker
 ```
 
-Run it first, before you change anything, so you can see how it currently
-behaves. Look carefully at the end-of-day stock report.
+Or with Maven: `mvn compile`, then the same `java` line.
 
-## What to hand in
+To compare with the original, check the output against [expected-output-before.txt](expected-output-before.txt). Only three lines differ, all from the one sale that asks for more Amoxicillin than is in stock. It is now refused, stock stays at 39 instead of -61, and three transactions are recorded instead of four. Section 5 of the diagnosis has the details.
 
-See the lab brief for the full list. In short: a written diagnosis, your rebuilt
-version (behaving exactly as the original does today), a short note on your key
-design decisions, and one improvement beyond the brief. You will talk through
-your work in a live review.
+## Project layout
+
+```
+src/main/java/
+  PharmacyTracker.java          the same morning of sales as the original
+  model/                        Pharmacy, Medication and its subclasses, Customer, Transaction
+  enums/                        Category, CustomerKind, TransactionType
+  exception/                    DispenseException and the reasons a sale can be refused
+```
+
+## Design notes
+
+### Each kind of medicine owns its own rule
+
+`Medication` is abstract, and `OtcMedication` and `PrescriptionMedication` each override `verifyDispensable(prescriber)`. `Pharmacy.dispense` has one path for every medicine and just asks the medicine whether it can be sold.
+
+I picked this over keeping a category enum and a `switch` in `Pharmacy`. With a `switch`, every new kind of medicine means editing `dispense` again, which is the same method that was edited when a change to one kind of medicine broke another. With subclasses, a new kind is a new class and the existing ones aren't touched.
+
+The category is never stored as a field. Each subclass returns its own `Category` from `getCategory()`, so a medicine and its category can't disagree, and the report still prints `OTC` and `PRESCRIPTION` exactly as before.
+
+### Stock can only change in one place
+
+`stock` is private, and the only ways to change it are `addStock` and `deductStock`. Both reject a quantity of 0 or less, and `deductStock` refuses to take more than is there. They are package-private, so only `Pharmacy` can call them. This is the rule the business said must never be broken, so it lives inside `Medication` where nothing can get around it, not in `dispense` where any other code could still skip it.
+
+### A refused sale leaves no trace
+
+When a sale can't go ahead, the medicine throws an unchecked exception: `MissingPrescriberException` or `InsufficientStockException`, both extending `DispenseException`. `Pharmacy` catches the one parent type and prints its message. Everything that records the sale (history, transaction, receipt line) comes after the checks, so a refused sale records nothing.
+
+I chose exceptions over returning `true`/`false`, because a return value is easy to ignore and the sale would go through anyway. I made them unchecked because `Pharmacy` handles them in one place, and checked exceptions would force every caller to deal with them.
+
+### Nothing can be put in a bad state from outside
+
+- All fields are private. Constructors and setters reject bad values (blank names, a price of 0 or less, negative opening stock, a missing customer kind), and constructors go through the same setters so each check lives in one place.
+- Setters are `final` so a subclass can't skip the check.
+- `Transaction` has no setters at all. It's the record of a sale, so it can't be edited afterwards.
+- `getTransactions()`, `getHistory()` and the other list getters return read-only copies, so outside code can't add to or clear the audit trail.
+- Enums replace the raw strings (`"OTC"`, `"WALK_IN"`, `"DISPENSE"`), so a typo is a compile error instead of a silent wrong path.
+
+### Kept the same on purpose
+
+Money is still a `double`, messages keep the original wording, and the id counters are unchanged. Changing any of these would change the output, and the point of this rebuild is to behave the same.
+
+### Adding controlled substances
+
+Controlled substances are a third kind of medicine with stricter rules, and every dispense has to record the prescriber. With this structure:
+
+1. Add `CONTROLLED` to `Category`.
+2. Add a `ControlledMedication` class that overrides `verifyDispensable` with the stricter rule.
+3. In `Pharmacy.dispense`, show "(prescribed by …)" for controlled medicines too. That's the one line that currently checks for `PRESCRIPTION`.
+4. Give `Transaction` a `prescriber` field, filled in by `dispense`, so the prescriber is stored and not just printed.
+
+`OtcMedication`, `PrescriptionMedication`, the stock rules and the report don't change.
+
+In the original, the same change would have meant a third `else if` branch in `dispense`, copying the price, discount, stock and print code a third time, and adding more string comparisons. Every one of those edits sits in the same method as the two medicine types that already work, so it's easy to break them.
