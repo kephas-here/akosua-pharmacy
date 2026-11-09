@@ -85,6 +85,22 @@ In words:
 
 The rebuilt output should match the baseline line for line with exactly one intentional change: the final dispense of 100 amoxicillin is refused with a message, no transaction is recorded, and amoxicillin stays at 39 instead of minus 61. That single difference is the rule the business said must never be broken.
 
+The rebuilt output is in [`actual-output-after.txt`](actual-output-after.txt). Compared with the baseline, that one change shows up as three lines and nothing else differs:
+
+| Line | Before | After |
+|---|---|---|
+| 4 | `Dispensed 100 x Amoxicillin 250mg to Kofi Mensah (prescribed by Dr. Boateng) for GHS 3000.0` | `Cannot dispense 100 x Amoxicillin 250mg: only 39 in stock` |
+| 9 | `Amoxicillin 250mg (PRESCRIPTION): -61 in stock` | `Amoxicillin 250mg (PRESCRIPTION): 39 in stock` |
+| 10 | `Transactions today: 4` | `Transactions today: 3` |
+
+To reproduce it (from Git Bash):
+
+```bash
+javac -d target/classes $(find src/main/java -name '*.java')
+java -cp target/classes PharmacyTracker > actual-output-after.txt
+diff expected-output-before.txt actual-output-after.txt
+```
+
 ## 6. Design changes during the build
 
 - **`StockNotEnoughException` renamed to `InsufficientStockException`.** "Insufficient stock" is the standard phrase in Java and in retail, and it reads more clearly at the throw site. The class does the same job in the same place in the hierarchy, so the sketch above still shows it under its original name.

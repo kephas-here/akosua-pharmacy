@@ -1,6 +1,7 @@
 package model;
 
 import enums.Category;
+import exception.InsufficientStockException;
 
 public abstract class Medication {
     private String name;
@@ -57,6 +58,9 @@ public abstract class Medication {
 
     void deductStock(int qty) {
         requirePositive(qty);
+        if (stock < qty) {
+            throw new InsufficientStockException(name, qty, stock);
+        }
         stock -= qty;
     }
 
