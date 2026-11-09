@@ -2,22 +2,29 @@
 
 A rebuild of the pharmacy's stock and dispensing tracker. It does exactly what the original did, except that stock can no longer go below zero.
 
-- Diagnosis and design sketch: [DIAGNOSIS.md](DIAGNOSIS.md)
+- Diagnosis: [DIAGNOSIS.md](DIAGNOSIS.md)
+- Design sketch: [design-sketch.jpg](design-sketch.jpg)
 - Output of the original program: [expected-output-before.txt](expected-output-before.txt)
 - Output of the rebuild: [actual-output-after.txt](actual-output-after.txt)
 
 ## Running it
 
-You need JDK 21. From the project folder, in any terminal:
+You need JDK 21 and Maven. From the project folder:
 
 ```bash
-javac -d target/classes -sourcepath src/main/java src/main/java/pharmacy/PharmacyTracker.java
+mvn compile
 java -cp target/classes pharmacy.PharmacyTracker
 ```
 
-Or with Maven: `mvn compile`, then the same `java` line.
+`mvn test` runs all the tests, including the one that checks the output.
 
-To compare with the original, check the output against [expected-output-before.txt](expected-output-before.txt). Only three lines differ, all from the one sale that asks for more Amoxicillin than is in stock. It is now refused, stock stays at 39 instead of -61, and three transactions are recorded instead of four. Section 5 of the diagnosis has the details.
+Without Maven, compile with the JDK instead, then run the same `java` line:
+
+```bash
+javac -d target/classes -sourcepath src/main/java src/main/java/pharmacy/PharmacyTracker.java
+```
+
+Compared with [expected-output-before.txt](expected-output-before.txt), only three lines differ, all from the one sale that asks for more Amoxicillin than is in stock. It is now refused, stock stays at 39 instead of -61, and three transactions are recorded instead of four. Section 5 of the diagnosis has the details.
 
 ## Tests (improvement beyond the brief)
 
@@ -67,23 +74,32 @@ The category is never stored as a field. Each subclass returns its own `Category
 
 `stock` is private, and the only ways to change it are `addStock` and `deductStock`. Both reject a quantity of 0 or less, and `deductStock` refuses to take more than is there. They are package-private, so only `Pharmacy` can call them. This is the rule the business said must never be broken, so it lives inside `Medication` where nothing can get around it, not in `dispense` where any other code could still skip it.
 
-### A refused sale leaves no trace
+### A refused sale records nothing
 
 When a sale can't go ahead, the medicine throws an unchecked exception: `MissingPrescriberException` or `InsufficientStockException`, both extending `DispenseException`. `Pharmacy` catches the one parent type and prints its message. Everything that records the sale (history, transaction, receipt line) comes after the checks, so a refused sale records nothing. The refusal itself is kept in `getRefusals()`, so the pharmacy can see afterwards what was turned away and why, not just in what was printed.
 
 I chose exceptions over returning `true`/`false`, because a return value is easy to ignore and the sale would go through anyway. I made them unchecked because `Pharmacy` handles them in one place, and checked exceptions would force every caller to deal with them.
 
+`dispense` is the only place a `DispenseException` can be thrown, and it catches all of them, so a refused sale can't crash the run. Bad input such as a negative quantity or a blank name throws `IllegalArgumentException` instead. That's a mistake in the calling code, not a sale being turned away, so it's left to fail loudly.
+
 ### Nothing can be put in a bad state from outside
 
 - All fields are private. Constructors and setters reject bad values (blank names, a price of 0 or less, negative opening stock, a missing customer kind), and constructors go through the same setters so each check lives in one place.
+- `addMedication` and `addCustomer` reject `null`, so the pharmacy's lists can't hold an empty entry.
 - Setters are `final` so a subclass can't skip the check.
-- `Transaction` has no setters at all. It's the record of a sale, so it can't be edited afterwards. It also stores the prescriber for every prescription sale, since the original only printed it and then lost it.
+- `Transaction` has no setters at all. It's the record of a sale, so it can't be edited afterwards. It also stores the prescriber for every prescription sale, since the original only printed it and then lost it. Its constructor checks every value itself, including rejecting a blank prescriber, so a bad record can't be created even outside `dispense`.
 - `getTransactions()`, `getHistory()` and the other list getters return read-only copies, so outside code can't add to or clear the audit trail.
 - Enums replace the raw strings (`"OTC"`, `"WALK_IN"`, `"DISPENSE"`), so a typo is a compile error instead of a silent wrong path.
 
+### Why `Pharmacy` stays in `model`
+
+`Pharmacy` uses package-private methods (`addStock`, `deductStock`, `verifyDispensable`, `addHistory`) that the rest of the code can't reach. Moving it to its own service package would mean making those methods public, so any code could change stock directly again. Keeping it next to the classes it controls is what keeps the stock rule enforced.
+
 ### Kept the same on purpose
 
-Money is still a `double`, messages keep the original wording, and the id counters are unchanged. Changing any of these would change the output, and the point of this rebuild is to behave the same.
+Messages keep the original wording and the id counters are unchanged, so the output matches.
+
+Money is still a `double`, and that's a known risk. A `double` can't hold most decimal amounts exactly, so totals after the 5% discount can be off by tiny fractions, and those errors can add up across many sales. I left it because switching to `BigDecimal` changes how totals print (`25.00` instead of `25.0`), which would break the "behaves the same" requirement. It's the first thing I'd change next, using `BigDecimal` or whole pesewas stored as a `long`.
 
 ### Adding controlled substances
 
