@@ -11,21 +11,46 @@ import java.util.List;
 public class Pharmacy {
     private static final double REGISTERED_DISCOUNT = 0.95;
 
-    public String name;
-    public List<Medication> meds = new ArrayList<>();
-    public List<Customer> customers = new ArrayList<>();
-    private List<Transaction> transactions = new ArrayList<>();
+    private String name;
+    private final List<Medication> medications = new ArrayList<>();
+    private final List<Customer> customers = new ArrayList<>();
+    private final List<Transaction> transactions = new ArrayList<>();
 
     public Pharmacy(String name) {
+        setName(name);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public final void setName(String name) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Name cannot be blank");
+        }
         this.name = name;
     }
 
-    public void addMedication(Medication m) {
-        meds.add(m);
+    public List<Medication> getMedications() {
+        return List.copyOf(medications);
     }
 
-    public void addCustomer(Customer c) {
-        customers.add(c);
+    public List<Customer> getCustomers() {
+        return List.copyOf(customers);
+    }
+
+    public void addMedication(Medication medication) {
+        if (medication == null) {
+            throw new IllegalArgumentException("Medication is required");
+        }
+        medications.add(medication);
+    }
+
+    public void addCustomer(Customer customer) {
+        if (customer == null) {
+            throw new IllegalArgumentException("Customer is required");
+        }
+        customers.add(customer);
     }
 
     public void dispense(Customer customer, Medication medication, int qty, String prescriber) {
@@ -57,15 +82,15 @@ public class Pharmacy {
     }
 
     public List<Transaction> getTransactions() {
-        return transactions; // hand the list back so callers can read it
+        return List.copyOf(transactions);
     }
 
     public void printReport() {
         System.out.println();
         System.out.println("=== " + name + " - end of day ===");
         System.out.println("Stock levels:");
-        for (Medication m : meds) {
-            System.out.println("  " + m.getName() + " (" + m.getCategory() + "): " + m.getStock() + " in stock");
+        for (Medication medication : medications) {
+            System.out.println("  " + medication.getName() + " (" + medication.getCategory() + "): " + medication.getStock() + " in stock");
         }
         System.out.println("Transactions today: " + transactions.size());
     }

@@ -91,6 +91,13 @@ The rebuilt output should match the baseline line for line with exactly one inte
 - **Exceptions build their own messages.** Instead of a free-text message, each exception takes the facts it needs (`InsufficientStockException(medName, requested, available)`, `MissingPrescriberException(medName)`) and writes the message itself. Every refusal of the same kind is worded the same way, and the missing-prescriber message keeps the original program's exact wording.
 - **`DispenseException` is abstract.** It exists only as the one type `Pharmacy` catches, so it cannot be thrown on its own.
 - **Added a private `requirePositive(qty)` helper in `Medication`.** It isn't in the sketch. `addStock` and `deductStock` both use it, so the quantity check lives in one place.
+- **Names and price can change through `final` setters.** Pharmacy, medication and customer names, and medication price, each have a setter that rejects blank or invalid values. The setters are `final` so a subclass can't skip the check, and the constructors use them too. Transactions already recorded keep the name used at the time of sale.
 - **A blank prescriber is refused too, not just `null`.** This closes the gap noted in Problem 2. The output doesn't change since `main` never passes a blank one.
+- **Every field has a getter, and a validated setter where it makes sense.** The sketch only showed the main methods, but since the fields are private now these are the only way to read or change them. Each setter runs the same check as the constructor, and the constructor calls the setter so the check lives in one place. A few fields don't get setters on purpose:
+  - `stock` changes only through `addStock` and `deductStock`.
+  - The pharmacy's lists change only through `addMedication`, `addCustomer`, `dispense` and `restock`, and their getters return read-only copies.
+  - `id` is handed out once by the counter, so a setter could create duplicates.
+  - `Transaction` has getters only. It's the audit record of a sale, so it shouldn't be editable after the fact (Problem 4).
 - **`Customer.addHistory(medName, qty)` added.** It's package-private so only `Pharmacy` can write history, and `getHistory()` stays read-only.
 - **The registered discount is a constant.** `REGISTERED_DISCOUNT = 0.95` in `Pharmacy` replaces the `0.95` that was repeated in both branches.
+- **`meds` renamed to `medications`** in `Pharmacy` for readability.
