@@ -102,6 +102,8 @@ java -cp target/classes pharmacy.PharmacyTracker > actual-output-after.txt
 diff expected-output-before.txt actual-output-after.txt
 ```
 
+`PharmacyTrackerTest` runs the same check automatically: it runs the program, compares the output with `actual-output-after.txt`, and confirms only lines 4, 9 and 10 differ from the original.
+
 ## 6. Design changes during the build
 
 - **`StockNotEnoughException` renamed to `InsufficientStockException`.** "Insufficient stock" is the standard phrase in Java and in retail, and it reads more clearly at the throw site. The class does the same job in the same place in the hierarchy, so the sketch above still shows it under its original name.

@@ -33,6 +33,7 @@ I added JUnit tests for the rules the business depends on:
 - Quantities, prices and names are checked, so bad values are rejected.
 - The transaction list can't be changed from outside.
 - A refused sale is kept in the refusals list.
+- The whole program's output matches `actual-output-after.txt`, and differs from the original only on lines 4, 9 and 10.
 
 Anyone who changes the code next, like adding controlled substances, can run these and know straight away whether the existing rules still hold.
 
@@ -46,9 +47,10 @@ src/main/java/pharmacy/
   model/                        Pharmacy, Medication and its subclasses, Customer, Transaction
   enums/                        Category, CustomerKind, TransactionType
   exception/                    DispenseException and the reasons a sale can be refused
-src/test/java/pharmacy/model/
-  PharmacyTest.java             dispensing, refusals, discount, prescriber, read-only transactions
-  MedicationTest.java           stock and value checks on a single medicine
+src/test/java/pharmacy/
+  PharmacyTrackerTest.java      runs the program and compares its output with the saved files
+  model/PharmacyTest.java       dispensing, refusals, discount, prescriber, read-only transactions
+  model/MedicationTest.java     stock and value checks on a single medicine
 ```
 
 ## Design notes
