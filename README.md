@@ -53,7 +53,7 @@ I chose exceptions over returning `true`/`false`, because a return value is easy
 
 - All fields are private. Constructors and setters reject bad values (blank names, a price of 0 or less, negative opening stock, a missing customer kind), and constructors go through the same setters so each check lives in one place.
 - Setters are `final` so a subclass can't skip the check.
-- `Transaction` has no setters at all. It's the record of a sale, so it can't be edited afterwards.
+- `Transaction` has no setters at all. It's the record of a sale, so it can't be edited afterwards. It also stores the prescriber for every prescription sale, since the original only printed it and then lost it.
 - `getTransactions()`, `getHistory()` and the other list getters return read-only copies, so outside code can't add to or clear the audit trail.
 - Enums replace the raw strings (`"OTC"`, `"WALK_IN"`, `"DISPENSE"`), so a typo is a compile error instead of a silent wrong path.
 
@@ -68,8 +68,7 @@ Controlled substances are a third kind of medicine with stricter rules, and ever
 1. Add `CONTROLLED` to `Category`.
 2. Add a `ControlledMedication` class that overrides `verifyDispensable` with the stricter rule.
 3. In `Pharmacy.dispense`, show "(prescribed by …)" for controlled medicines too. That's the one line that currently checks for `PRESCRIPTION`.
-4. Give `Transaction` a `prescriber` field, filled in by `dispense`, so the prescriber is stored and not just printed.
 
-`OtcMedication`, `PrescriptionMedication`, the stock rules and the report don't change.
+Recording the prescriber is already handled: every dispense stores it on the `Transaction`, so a controlled sale gets that for free. `OtcMedication`, `PrescriptionMedication`, `Transaction`, the stock rules and the report don't change.
 
 In the original, the same change would have meant a third `else if` branch in `dispense`, copying the price, discount, stock and print code a third time, and adding more string comparisons. Every one of those edits sits in the same method as the two medicine types that already work, so it's easy to break them.

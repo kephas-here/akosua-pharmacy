@@ -9,9 +9,11 @@ public class Transaction {
     private final int qty;
     private final double total;
     private final TransactionType type;
+    private final String prescriber;
     static int counter = 1;
 
-    public Transaction(String customerName, String medName, int qty, double total, TransactionType type) {
+    public Transaction(String customerName, String medName, int qty, double total, TransactionType type,
+                       String prescriber) {
         if (customerName == null || customerName.isBlank()) {
             throw new IllegalArgumentException("Customer name cannot be blank");
         }
@@ -30,6 +32,9 @@ public class Transaction {
         if (type == TransactionType.DISPENSE && total == 0) {
             throw new IllegalArgumentException("A dispense must have a total greater than 0");
         }
+        if (prescriber != null && prescriber.isBlank()) {
+            throw new IllegalArgumentException("Prescriber cannot be blank");
+        }
         this.id = counter;
         counter++;
         this.customerName = customerName;
@@ -37,6 +42,7 @@ public class Transaction {
         this.qty = qty;
         this.total = total;
         this.type = type;
+        this.prescriber = prescriber;
     }
 
     public int getId() {
@@ -61,5 +67,9 @@ public class Transaction {
 
     public TransactionType getType() {
         return type;
+    }
+
+    public String getPrescriber() {
+        return prescriber;
     }
 }

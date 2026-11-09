@@ -62,8 +62,9 @@ public class Pharmacy {
             }
             medication.deductStock(qty);
             customer.addHistory(medication.getName(), qty);
+            String recordedPrescriber = prescriber == null || prescriber.isBlank() ? null : prescriber;
             transactions.add(new Transaction(customer.getName(), medication.getName(), qty, total,
-                    TransactionType.DISPENSE));
+                    TransactionType.DISPENSE, recordedPrescriber));
 
             String prescribedBy = medication.getCategory() == Category.PRESCRIPTION
                     ? " (prescribed by " + prescriber + ")" : "";
@@ -77,7 +78,7 @@ public class Pharmacy {
 
     public void restock(Medication medication, int qty) {
         medication.addStock(qty);
-        transactions.add(new Transaction("(supplier)", medication.getName(), qty, 0, TransactionType.RESTOCK));
+        transactions.add(new Transaction("(supplier)", medication.getName(), qty, 0, TransactionType.RESTOCK, null));
         System.out.println("Restocked " + qty + " x " + medication.getName());
     }
 
