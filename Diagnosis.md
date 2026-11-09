@@ -84,3 +84,9 @@ In words:
 ## 5. Expected difference from the original
 
 The rebuilt output should match the baseline line for line with exactly one intentional change: the final dispense of 100 amoxicillin is refused with a message, no transaction is recorded, and amoxicillin stays at 39 instead of minus 61. That single difference is the rule the business said must never be broken.
+
+## 6. Design changes during the build
+
+- **`StockNotEnoughException` renamed to `InsufficientStockException`.** "Insufficient stock" is the standard phrase in Java and in retail, and it reads more clearly at the throw site. The class does the same job in the same place in the hierarchy, so the sketch above still shows it under its original name.
+- **Exceptions build their own messages.** Instead of a free-text message, each exception takes the facts it needs (`InsufficientStockException(medName, requested, available)`, `MissingPrescriberException(medName)`) and writes the message itself. Every refusal of the same kind is worded the same way, and the missing-prescriber message keeps the original program's exact wording.
+- **`DispenseException` is abstract.** It exists only as the one type `Pharmacy` catches, so it cannot be thrown on its own.
