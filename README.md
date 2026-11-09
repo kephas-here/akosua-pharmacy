@@ -54,7 +54,7 @@ src/test/java/pharmacy/model/
 
 ### Each kind of medicine owns its own rule
 
-`Medication` is abstract, and `OtcMedication` and `PrescriptionMedication` each override `verifyDispensable(prescriber)`. `Pharmacy.dispense` has one path for every medicine and just asks the medicine whether it can be sold.
+`Medication` is abstract, and `OtcMedication` and `PrescriptionMedication` each override `verifyDispensable(prescriber)`. `Pharmacy.dispense` has one path for every medicine and just asks the medicine whether it can be sold. The medicine also writes its own "(prescribed by …)" note through `prescriberNote`, so `Pharmacy` never checks which kind of medicine it has.
 
 I picked this over keeping a category enum and a `switch` in `Pharmacy`. With a `switch`, every new kind of medicine means editing `dispense` again, which is the same method that was edited when a change to one kind of medicine broke another. With subclasses, a new kind is a new class and the existing ones aren't touched.
 
@@ -87,9 +87,8 @@ Money is still a `double`, messages keep the original wording, and the id counte
 Controlled substances are a third kind of medicine with stricter rules, and every dispense has to record the prescriber. With this structure:
 
 1. Add `CONTROLLED` to `Category`.
-2. Add a `ControlledMedication` class that overrides `verifyDispensable` with the stricter rule.
-3. In `Pharmacy.dispense`, show "(prescribed by …)" for controlled medicines too. That's the one line that currently checks for `PRESCRIPTION`.
+2. Add a `ControlledMedication` class that extends `PrescriptionMedication`, calls the parent's check and adds the stricter rule in `verifyDispensable`, and returns `CONTROLLED` from `getCategory()`.
 
-Recording the prescriber is already handled: every dispense stores it on the `Transaction`, so a controlled sale gets that for free. `OtcMedication`, `PrescriptionMedication`, `Transaction`, the stock rules and the report don't change.
+That's it. It inherits the "(prescribed by …)" note, and every dispense already stores the prescriber on the `Transaction`. `Pharmacy`, `OtcMedication`, `PrescriptionMedication`, `Transaction`, the stock rules and the report don't change.
 
 In the original, the same change would have meant a third `else if` branch in `dispense`, copying the price, discount, stock and print code a third time, and adding more string comparisons. Every one of those edits sits in the same method as the two medicine types that already work, so it's easy to break them.

@@ -1,6 +1,5 @@
 package pharmacy.model;
 
-import pharmacy.enums.Category;
 import pharmacy.enums.CustomerKind;
 import pharmacy.enums.TransactionType;
 import pharmacy.exception.DispenseException;
@@ -65,12 +64,8 @@ public class Pharmacy {
             String recordedPrescriber = prescriber == null || prescriber.isBlank() ? null : prescriber;
             transactions.add(new Transaction(customer.getName(), medication.getName(), qty, total,
                     TransactionType.DISPENSE, recordedPrescriber));
-
-            String prescribedBy = medication.getCategory() == Category.PRESCRIPTION
-                    ? " (prescribed by " + prescriber + ")" : "";
-
             System.out.println("Dispensed " + qty + " x " + medication.getName() + " to " + customer.getName()
-                    + prescribedBy + " for GHS " + total);
+                    + medication.prescriberNote(prescriber) + " for GHS " + total);
         } catch (DispenseException e) {
             System.out.println(e.getMessage());
         }

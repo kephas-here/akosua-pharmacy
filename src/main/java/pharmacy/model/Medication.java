@@ -72,5 +72,9 @@ public abstract class Medication {
 
     abstract void verifyDispensable(String prescriber);
 
+    String prescriberNote(String prescriber) {
+        return "";
+    }
+
     public abstract Category getCategory();
 }

@@ -16,6 +16,11 @@ public class PrescriptionMedication extends Medication {
     }
 
     @Override
+    String prescriberNote(String prescriber) {
+        return " (prescribed by " + prescriber + ")";
+    }
+
+    @Override
     public Category getCategory() {
         return Category.PRESCRIPTION;
     }
