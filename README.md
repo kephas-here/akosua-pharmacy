@@ -2,7 +2,7 @@
 
 A rebuild of the pharmacy's stock and dispensing tracker. It does exactly what the original did, except that stock can no longer go below zero.
 
-- Diagnosis and design sketch: [Diagnosis.md](Diagnosis.md)
+- Diagnosis and design sketch: [DIAGNOSIS.md](DIAGNOSIS.md)
 - Output of the original program: [expected-output-before.txt](expected-output-before.txt)
 - Output of the rebuild: [actual-output-after.txt](actual-output-after.txt)
 
